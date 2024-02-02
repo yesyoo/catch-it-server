@@ -2,85 +2,70 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { filter } from 'rxjs';
-import { ItemDto } from 'src/dto/item-dto';
-import { ItemDataDto } from 'src/dto/itemdata-dto';
-import { PersonalClothesDto } from 'src/dto/personal-dto';
+import { ItemDto } from 'src/dto/item/item-dto';
+import { ItemDataDto } from 'src/dto/item/itemdata-dto';
+import { PersonalClothesDto } from 'src/dto/item/personal-dto';
 import { DealType } from 'src/interfaces/items';
 import { PersonalClothesDocument, Personal_Clothes } from 'src/schemas/item/personal/clothes-schema';
 import { PersonalShoesDocument, Personal_Shoes } from 'src/schemas/item/personal/shoes-schema';
-
-import { PersonalShoesDto } from '../../dto/personal-dto';
+import { PersonalShoesDto } from '../../dto/item/personal-dto';
 
 @Injectable()
 export class ItemService {
     constructor(@InjectModel(Personal_Shoes.name) private personalShoesModel: Model<PersonalShoesDocument>,
                 @InjectModel(Personal_Clothes.name) private personalClothesModel: Model<PersonalClothesDocument>) {}
 
-    async getItems(params: any): Promise<any[]> {
-        let res;
+    async getItemsByParams(params: any): Promise<any[]> {
+        let result: any[] = []
         let filter = {}
 
-        if('dealType' in params) {
-            filter['dealType'] = params.dealType
-        }
-        if('subcategoryType' in params) {
-            filter['subcategoryType'] = params.subcategoryType
-        }
-        if('delivery' in params) {
-            filter['itemProp.delivery'] = params.delivery
-        }
-        if('condition' in params) {
-            filter['itemProp.condition'] = params.condition
-        }
-        if('type' in params) {
-            filter['categoryProp.type'] = params.type
-        } 
-        if('size' in params) {
-            filter['categoryProp.size'] = params.size
-        }
-        if('season' in params) {
-            filter['categoryProp.season'] = params.season
-        }
-        if('color' in params) {
-            filter['categoryProp.color'] = params.color
-        }
+        if('deal' in params) filter['deal'] = params.deal
+        if('category' in params) filter['category'] = params.category
+        if('delivery' in params) filter['item.delivery'] = params.delivery
+        if('condition' in params) filter['item.condition'] = params.condition
+        if('type' in params) filter['itemCat.type'] = params.type
+        if('size' in params) filter['itemCat.size'] = params.size
+        if('season' in params) filter['itemCat.season'] = params.season
+        if('color' in params) filter['itemCat.color'] = params.color
+        
         switch(params.collection) {
             case "personal-shoes":
-                res = await this.personalShoesModel.find(filter)
+                result = await this.personalShoesModel.find(filter)
                 break;
             case "personal-clothes":
-                res = await this.personalClothesModel.find(filter)
+                result = await this.personalClothesModel.find(filter)
                 break;
         }
-        console.log('result', res)
-        return res
+        return result
 
     }
-    async sendShoes(data: {userId: string, dealType: DealType, subcategoryType: string, form: {itemProp: ItemDto, categoryProp: PersonalShoesDto }}): Promise<any> {
-        const item = data.form.itemProp
-        const cat = data.form.categoryProp
+    async sendShoes(data: {userId: string, collection: string, category: string, deal: string, item: ItemDto, itemCat: PersonalShoesDto}): Promise<any> {
+        const item = data.item
+        const cat = data.itemCat
         const obj = {
             userId: data.userId,
-            dealType: data.dealType,
-            subcategoryType: data.subcategoryType,
+            collection: data.collection,
+            category: data.category,
+            deal: data.deal,
             itemState: new ItemDataDto(),
-            itemProp: new ItemDto(item.title, item.description, item.condition, item.amount, item.city, item.district, item.delivery, item.img),
-            categoryProp: new PersonalShoesDto(cat.type, cat.size, cat.season, cat.color, cat.gender, cat.age)
+            item: new ItemDto(item.title, item.description, item.condition, item.amount, item.city, item.district, item.delivery, item.img),
+            itemCat: new PersonalShoesDto(cat.type, cat.size, cat.season, cat.color, cat.gender, cat.age)
         }
         const post = new this.personalShoesModel(obj)
         post.save()    
     }
 
-    async sendClothes(data: {userId: string, dealType: DealType, subcategoryType: string, form: {itemProp: ItemDto, categoryProp: PersonalClothesDto }}): Promise<any> {
-        const item = data.form.itemProp
-        const cat = data.form.categoryProp
+    async sendClothes(data: {userId: string, collection: string, category: string, deal: string, item: ItemDto, itemCat: PersonalClothesDto}): Promise<any> {
+        const item = data.item
+        const cat = data.itemCat
         const obj = {
             userId: data.userId,
-            dealType: data.dealType,
-            subcategoryType: data.subcategoryType,
+            collection: data.collection,
+            category: data.category,
+            deal: data.deal,
             itemState: new ItemDataDto(),
-            itemProp: new ItemDto(item.title, item.description, item.condition, item.amount, item.city, item.district, item.delivery, item.img),
-            categoryProp: new PersonalClothesDto(cat.type, cat.size, cat.season, cat.color, cat.gender, cat.age)
+            item: new ItemDto(item.title, item.description, item.condition, item.amount, item.city, item.district, item.delivery, item.img),
+            itemCat: new PersonalClothesDto(cat.type, cat.size, cat.season, cat.color, cat.gender, cat.age)
         }
         const post = new this.personalClothesModel(obj)
         post.save()    
@@ -88,7 +73,7 @@ export class ItemService {
 
     async getByItemId(params): Promise<any> {
         let response
-        switch(params.category) {
+        switch(params.collection) {
             case 'personal-shoes':
                 response = await this.personalShoesModel.findOne({_id: params.itemId})
                 break;
@@ -99,21 +84,9 @@ export class ItemService {
         return response
     };
 
-    // async getAllByCategory(params): Promise<any> {
-    //     let response
-    //     switch(params.category) {
-    //         case 'personal-shoes':
-    //             response = await this.personalShoesModel.find({_id: params.itemId})
-    //             break;
-    //         case 'personal-clothes':
-    //             response = await this.personalClothesModel.find({_id: params.itemId})
-    //             break;
-    //     }
-    //     return response
-    // };
     async deleteAllByCategory(params): Promise<any> {
         let response
-        switch(params.category) {
+        switch(params.collection) {
             case 'personal-shoes':
                 response = await this.personalShoesModel.deleteMany({})
                 break;
@@ -122,6 +95,28 @@ export class ItemService {
                 break;
         }
         return response
+    };
+
+    async getAllByUserId(userId: string): Promise<any[]> {
+        let resultArr: any[] = []
+        let shoesArr = await this.personalShoesModel.find({userId: userId});
+        let clothesArr = await this.personalClothesModel.find({userId: userId});
+        
+        if(shoesArr.length !== 0) {
+            shoesArr.forEach(item => resultArr.push(item))
+        }
+        if(clothesArr.length !== 0) {
+            clothesArr.forEach(item => resultArr.push(item))
+        }
+        console.log(resultArr)
+        return resultArr
+    };
+    async deleteItem(params): Promise<any> {
+        if(params.collection === "personal-shoes") {
+            await this.personalShoesModel.findByIdAndDelete(params.id)
+            return { response:'success'}
+        }
+        
     }
 }
 

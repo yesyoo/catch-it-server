@@ -28,16 +28,18 @@ export const ClothesSchema = SchemaFactory.createForClass(Clothes);
 export class Personal_Clothes {
   
     @Prop() userId: string
- 
-    @Prop() dealType: string
 
-    @Prop() subcategoryType: string
+    @Prop() collection: string
+ 
+    @Prop() category: string
+
+    @Prop() deal: string
     
     @Prop({type: ItemStateSchema}) itemState: IItemState
  
-    @Prop({type: ItemSchema}) itemProp: IItem
+    @Prop({type: ItemSchema}) item: IItem
 
-    @Prop({type: ClothesSchema}) categoryProp: IPersonalClothes
+    @Prop({type: ClothesSchema}) itemCat: IPersonalClothes
 };
 
 export const PersonalClothesSchema = SchemaFactory.createForClass(Personal_Clothes);
