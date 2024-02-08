@@ -8,9 +8,8 @@ export class ItemDto implements IItem {
     city: string;
     district: string;
     delivery?: Delivery;
-    img?: string;
 
-    constructor(title: string, description: string, condition: Condition, amount: number, city: string, district: string, delivery: Delivery, img: string) {
+    constructor(title: string, description: string, condition: Condition, amount: number, city: string, district: string, delivery: Delivery) {
         this.title = title
         this.description = description
         this.condition = condition
@@ -18,6 +17,5 @@ export class ItemDto implements IItem {
         this.city = city
         this.district = district
         this.delivery = delivery
-        this.img = img
     };
 };

@@ -1,16 +1,15 @@
 import { IUserData } from "src/interfaces/user";
 
 export class UserDataDto implements IUserData {
-
     username: string
     city: string
     district: string
-    userId: string
+    user: string
 
-    constructor(user: {username: string, city: string, district: string, userId: string}) {
+    constructor(user: {username: string, city: string, district: string, user: string}) {
         this.username = user.username
         this.city = user.city
         this.district = user.district
-        this.userId = user.userId
+        this.user = user.user
     }
 }

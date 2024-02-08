@@ -7,13 +7,15 @@ export type ShoesSize =  "16" | "17" | "18" | "19" | "20" | "21" | "22" | "23" |
 | "31" | "32" | "33" | "34" | "35" | "36" | "37" | "38" | "39" | "40" | "41" | "42" | "43" | "44" | "45" | "46" | "47" | "one-size";
 export type ClothesSize = "xxs" | "xs" | "s" | "m" | "l" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "104" | "110" | "116" | "122" | "128" 
 | "134" | "140" | "146" | "152" | "158" | "164" | "one-size";
-export type Gender = "male" | "female";
+export type Gender = "male" | "female" | 'genderless'
 export type Age = "adult" | "child";
 export type Color = "black" | "white" | "multi-color";
 export type Season = "summer" | "winter" | "demi-season"
 
 export type CategoryType = "personal-shoes" | "personal-clothes" | "personal-bags" | "personal-accessoires"
 | "kids-all" | "home-all" | "pets-all" 
+
+export type CategoryUnionType = IPersonalClothes | IPersonalShoes
 
 
 export interface IItem {
@@ -23,10 +25,10 @@ export interface IItem {
     amount?: number,
     city?: string,
     district?: string
-    delivery?: Delivery,
-    img?: string,
+    delivery?: Delivery
 };
 export interface IItemState {
+    date: number,
     show: boolean,
     reserved: boolean,
     blocked: boolean
@@ -38,7 +40,7 @@ export interface IPersonalShoes {
     season: Season,
     color: Color,
     gender: string,
-    age: string
+    adult: boolean
 };
 
 export interface IPersonalClothes {
@@ -47,5 +49,18 @@ export interface IPersonalClothes {
     season: Season,
     color: Color,
     gender: string,
-    age: string
+    adult: boolean
 };
+
+export interface IItemDB {
+    user: string,
+    collection: string,
+    category: string,
+    deal: string,
+    date: number,
+    show: boolean,
+    reserved: boolean,
+    blocked: boolean
+    item: IItem,
+    cat: CategoryUnionType
+}

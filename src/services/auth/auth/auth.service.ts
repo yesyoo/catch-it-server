@@ -19,7 +19,7 @@ export class AuthService extends PassportStrategy(Strategy) {
             throw new HttpException( 
                 {
                     status: HttpStatus.CONFLICT,
-                    errorText: 'Неверный пароль'
+                    errorText: 'Incorrect password'
                 }, 
                 HttpStatus.CONFLICT)
         }

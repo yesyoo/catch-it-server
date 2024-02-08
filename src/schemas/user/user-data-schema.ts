@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
 import { HydratedDocument, Document } from 'mongoose';
-import { IUser, IUserData } from 'src/interfaces/user';
+import { IUserData } from 'src/interfaces/user';
 
 @Schema()
 export class User_data implements IUserData {
@@ -15,7 +15,7 @@ export class User_data implements IUserData {
 
     @Prop() img: string
 
-    @Prop() userId: string
+    @Prop() user: string
 
 }
 

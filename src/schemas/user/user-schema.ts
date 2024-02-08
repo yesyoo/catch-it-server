@@ -12,7 +12,7 @@ export class User implements IUser {
 
     @Prop() role: Role
 
-}
+};
 
 export const UserSchema = SchemaFactory.createForClass(User);
 export type UserDocument = HydratedDocument<User>;

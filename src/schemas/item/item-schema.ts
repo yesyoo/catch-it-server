@@ -18,7 +18,6 @@ export class Item implements IItem {
 
     @Prop() delivery?: Delivery
 
-    @Prop() img: string
 };
 
 export const ItemSchema = SchemaFactory.createForClass(Item);

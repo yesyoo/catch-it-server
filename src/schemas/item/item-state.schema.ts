@@ -5,7 +5,7 @@ import { IItemState } from "src/interfaces/items"
 @Schema({_id: false})
 export class ItemState implements IItemState {
     
-    @Prop() deal: string;
+    @Prop() date: number;
 
     @Prop() show: boolean;
 

@@ -12,5 +12,5 @@ export interface IUserData {
     district?: string
     descripton?: string
     img?: string
-    userId?: string
+    user?: string
 };

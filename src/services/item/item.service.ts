@@ -1,11 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { filter } from 'rxjs';
 import { ItemDto } from 'src/dto/item/item-dto';
-import { ItemDataDto } from 'src/dto/item/itemdata-dto';
 import { PersonalClothesDto } from 'src/dto/item/personal-dto';
-import { DealType } from 'src/interfaces/items';
+import { IItemDB } from 'src/interfaces/items';
 import { PersonalClothesDocument, Personal_Clothes } from 'src/schemas/item/personal/clothes-schema';
 import { PersonalShoesDocument, Personal_Shoes } from 'src/schemas/item/personal/shoes-schema';
 import { PersonalShoesDto } from '../../dto/item/personal-dto';
@@ -15,109 +13,124 @@ export class ItemService {
     constructor(@InjectModel(Personal_Shoes.name) private personalShoesModel: Model<PersonalShoesDocument>,
                 @InjectModel(Personal_Clothes.name) private personalClothesModel: Model<PersonalClothesDocument>) {}
 
-    async getItemsByParams(params: any): Promise<any[]> {
-        let result: any[] = []
+    async getByParams(params: any): Promise<IItemDB[]> {
         let filter = {}
-
         if('deal' in params) filter['deal'] = params.deal
         if('category' in params) filter['category'] = params.category
         if('delivery' in params) filter['item.delivery'] = params.delivery
         if('condition' in params) filter['item.condition'] = params.condition
-        if('type' in params) filter['itemCat.type'] = params.type
-        if('size' in params) filter['itemCat.size'] = params.size
-        if('season' in params) filter['itemCat.season'] = params.season
-        if('color' in params) filter['itemCat.color'] = params.color
+        if('type' in params) filter['cat.type'] = params.type
+        if('size' in params) filter['cat.size'] = params.size
+        if('season' in params) filter['cat.season'] = params.season
+        if('color' in params) filter['cat.color'] = params.color
+        filter['show'] = true
         
         switch(params.collection) {
             case "personal-shoes":
-                result = await this.personalShoesModel.find(filter)
-                break;
+                console.log(await this.personalShoesModel.find(filter))
+                return await this.personalShoesModel.find(filter)
             case "personal-clothes":
-                result = await this.personalClothesModel.find(filter)
-                break;
-        }
-        return result
+                return await this.personalClothesModel.find(filter)
+        };
+    };
 
-    }
-    async sendShoes(data: {userId: string, collection: string, category: string, deal: string, item: ItemDto, itemCat: PersonalShoesDto}): Promise<any> {
-        const item = data.item
-        const cat = data.itemCat
-        const obj = {
-            userId: data.userId,
+    async postItem(data: {user: string, collection: string, category: string, deal: string, item: string, cat: string, img: string }): Promise<any> {
+        const item = JSON.parse(data.item)
+        const cat = JSON.parse(data.cat)
+        console.log('deal', data.deal)
+        let obj = {
+            user: data.user,
             collection: data.collection,
             category: data.category,
             deal: data.deal,
-            itemState: new ItemDataDto(),
-            item: new ItemDto(item.title, item.description, item.condition, item.amount, item.city, item.district, item.delivery, item.img),
-            itemCat: new PersonalShoesDto(cat.type, cat.size, cat.season, cat.color, cat.gender, cat.age)
-        }
-        const post = new this.personalShoesModel(obj)
-        post.save()    
-    }
-
-    async sendClothes(data: {userId: string, collection: string, category: string, deal: string, item: ItemDto, itemCat: PersonalClothesDto}): Promise<any> {
-        const item = data.item
-        const cat = data.itemCat
-        const obj = {
-            userId: data.userId,
-            collection: data.collection,
-            category: data.category,
-            deal: data.deal,
-            itemState: new ItemDataDto(),
-            item: new ItemDto(item.title, item.description, item.condition, item.amount, item.city, item.district, item.delivery, item.img),
-            itemCat: new PersonalClothesDto(cat.type, cat.size, cat.season, cat.color, cat.gender, cat.age)
-        }
-        const post = new this.personalClothesModel(obj)
-        post.save()    
-    };
-
-    async getByItemId(params): Promise<any> {
-        let response
-        switch(params.collection) {
-            case 'personal-shoes':
-                response = await this.personalShoesModel.findOne({_id: params.itemId})
-                break;
+            date: Date.now(),
+            show: true,
+            reserved: false,
+            blocked: false,
+            item: new ItemDto(item.title, item.description, item.condition, item.amount, item.city, item.district, item.delivery),
+            img: data.img
+        };
+        switch(data.collection) {
             case 'personal-clothes':
-                response = await this.personalClothesModel.findOne({_id: params.itemId})
-                break;
+                obj['cat'] = new PersonalClothesDto(data.category, cat.type, cat.size, cat.season, cat.color);
+                return new this.personalClothesModel(obj).save()  
+            case 'personal-shoes': 
+                obj['cat'] = new PersonalShoesDto(data.category, cat.type, cat.size, cat.season, cat.color);
+                return new this.personalShoesModel(obj).save()  
         }
-        return response
     };
 
-    async deleteAllByCategory(params): Promise<any> {
-        let response
-        switch(params.collection) {
+    async deleteAll(collection: string): Promise<any> {
+        switch(collection) {
             case 'personal-shoes':
-                response = await this.personalShoesModel.deleteMany({})
-                break;
+                return await this.personalShoesModel.deleteMany({})
             case 'personal-clothes':
-                response = await this.personalClothesModel.deleteMany({})
-                break;
-        }
-        return response
+                return await this.personalClothesModel.deleteMany({})
+        };
     };
 
-    async getAllByUserId(userId: string): Promise<any[]> {
-        let resultArr: any[] = []
-        let shoesArr = await this.personalShoesModel.find({userId: userId});
-        let clothesArr = await this.personalClothesModel.find({userId: userId});
-        
-        if(shoesArr.length !== 0) {
-            shoesArr.forEach(item => resultArr.push(item))
-        }
-        if(clothesArr.length !== 0) {
-            clothesArr.forEach(item => resultArr.push(item))
-        }
-        console.log(resultArr)
-        return resultArr
+    async getByUserIdForOwner(id: string): Promise<any>{
+        return this.getByUserId(id, false)
     };
-    async deleteItem(params): Promise<any> {
-        if(params.collection === "personal-shoes") {
-            await this.personalShoesModel.findByIdAndDelete(params.id)
-            return { response:'success'}
-        }
-        
-    }
+
+    async getByUserIdForUsers(id: string): Promise<any> {
+        return this.getByUserId(id, true)
+    };
+
+    async getByUserId(id: string, show: boolean): Promise<any[]> {
+        const models = this.models()
+        let result: IItemDB[] = []
+        return new Promise((res) => {
+            (async () => {
+                for(let i = 0; i < models.length; i++) {
+                    if(show === true) {
+                        await models[i].find({user: id, show: true}).then((data: IItemDB[]) => {
+                            if(data.length > 0) data.forEach(obj => result.push(obj))
+                        })
+                    } else {
+                        await models[i].find({user: id}).then((data: IItemDB[]) => {
+                            if(data.length > 0) data.forEach(obj => result.push(obj))
+                        })
+                    }
+                };
+                res(result)
+            })();
+        });
+    };
+
+    async getById(id: string): Promise<any> {
+        const models: any[] = this.models()
+        return new Promise((res) => {
+            models.forEach(async model => {
+                await model.findById(id).then((data: IItemDB) => {
+                    if(data) res(data)
+                })
+            })
+        });
+    };
+
+    async deleteItem(id: string, collection: string): Promise<any> {
+        switch(collection) {
+            case 'personal-shoes':
+                return await this.personalShoesModel.findByIdAndDelete(id)
+            case 'personal-clothes':
+                return await this.personalClothesModel.findByIdAndDelete(id)
+        };
+    };
+
+    updateByParams(data: {id: string, collection: string, params: string}): Promise<any> {
+        const obj = JSON.parse(data.params)
+        switch(data.collection) {
+            case 'personal-shoes':
+                return this.personalShoesModel.findByIdAndUpdate(data.id, obj)
+            case 'personal-clothes':
+                return this.personalClothesModel.findByIdAndUpdate(data.id, obj)
+        };
+    };
+    
+    models(): any[] {
+        return [this.personalShoesModel, this.personalClothesModel]
+    };
 }
 
 

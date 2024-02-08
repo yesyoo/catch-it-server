@@ -1,14 +1,16 @@
-import { Controller, Post, Body, Delete, Param, Get, Query, Put } from '@nestjs/common';
+import { Controller, Post, Body, Delete, Param, Get, Query } from '@nestjs/common';
 import { UserDataDto } from 'src/dto/user/user-data-dto';
-import { User_data } from 'src/schemas/user/user-data-schema';
-import { User } from 'src/schemas/user/user-schema';
 import { UserService } from 'src/services/user/user.service';
-
 
 @Controller('users')
 export class UsersController {
 
     constructor(private userService: UserService) {}
+
+    @Get('admin/:id')
+    checkRole(@Param('id') id: string): Promise<any> {
+        return this.userService.checkRole(id)
+    };
 
     @Post('register')
     register(@Body() dto: {email: string, password: string, userData: UserDataDto}): Promise<any> {
@@ -26,17 +28,12 @@ export class UsersController {
     };
 
     @Get('id')
-    getById(@Query('id') id): Promise<any> {
+    getById(@Query('id') id: string): Promise<any> {
         return this.userService.getUserById(id)
     };
 
     @Get('user-data')
-    getUserDataByUserId(@Query('userId') userId: string): Promise<any> {
-        return this.userService.getUserDataByUserId(userId)
+    getUserDataByUserId(@Query('user') id: string): Promise<any> {
+        return this.userService.getUserDataByUserId(id)
     };
-
-   
-
-
-  
 }

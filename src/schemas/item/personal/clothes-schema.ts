@@ -2,9 +2,6 @@ import { Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { ItemSchema } from '../item-schema';
 import { ClothesSize, ClothesType, Color, Gender, IPersonalClothes, IItem, IItemState, Season } from 'src/interfaces/items';
-import { ItemStateSchema } from '../item-state.schema';
-
-
 
 @Schema({_id: false})
 export class Clothes implements IPersonalClothes {
@@ -19,7 +16,7 @@ export class Clothes implements IPersonalClothes {
 
     @Prop() gender: Gender
 
-    @Prop() age: string
+    @Prop() adult: boolean
 };
 
 export const ClothesSchema = SchemaFactory.createForClass(Clothes);
@@ -27,19 +24,27 @@ export const ClothesSchema = SchemaFactory.createForClass(Clothes);
 @Schema()
 export class Personal_Clothes {
   
-    @Prop() userId: string
+    @Prop() user: string
 
     @Prop() collection: string
  
     @Prop() category: string
 
     @Prop() deal: string
-    
-    @Prop({type: ItemStateSchema}) itemState: IItemState
+
+    @Prop() date: number;
+
+    @Prop() show: boolean;
+
+    @Prop() reserved: boolean;
+
+    @Prop() blocked: boolean;
  
     @Prop({type: ItemSchema}) item: IItem
 
-    @Prop({type: ClothesSchema}) itemCat: IPersonalClothes
+    @Prop({type: ClothesSchema}) cat: IPersonalClothes
+
+    @Prop() img: string
 };
 
 export const PersonalClothesSchema = SchemaFactory.createForClass(Personal_Clothes);

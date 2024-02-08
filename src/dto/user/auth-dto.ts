@@ -1,5 +1,3 @@
-import { IUser } from "src/interfaces/user";
-
 export class UserAuthDto {
     email: string
     password: string
