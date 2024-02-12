@@ -3,12 +3,12 @@ import { BookmarksController } from './bookmarks/bookmarks.controller';
 import { BookmarkService } from '../../services/bookmark/bookmark.service';
 
 import { MongooseModule } from '@nestjs/mongoose';
-import { Bookmark, BookmarkSchema } from 'src/schemas/bookmarks/bookmarks-schema';
+import { ItemBookmark, ItemBookmarkSchema } from 'src/schemas/bookmarks/bookmarks-schema';
 
 @Module({
   controllers: [BookmarksController],
   imports: [
-    MongooseModule.forFeature([{name: Bookmark.name, schema: BookmarkSchema}])
+    MongooseModule.forFeature([{name: ItemBookmark.name, schema: ItemBookmarkSchema}])
   ],
   providers: [BookmarkService]
 })

@@ -1,8 +1,10 @@
-import { Controller, Post, Body, Get, Query, Delete, UseInterceptors, Patch } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Delete, UseInterceptors, Patch, Put } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { IItemDB } from 'src/interfaces/items';
 import { ItemService } from 'src/services/item/item.service';
 import { diskStorage } from 'multer';
+import { query } from 'express';
+import { IItemBookmark } from 'src/interfaces/bookmark';
 
 
 
@@ -11,7 +13,7 @@ export class ItemsController {
     constructor(private itemService: ItemService) {}
     static imgName: string;
 
-    @Post()
+    @Post('create')
     @UseInterceptors(FileInterceptor('img', {
         storage: diskStorage(
             {
@@ -27,44 +29,57 @@ export class ItemsController {
             }
         )
     }))
-    postItem(@Body() data: {user: string, collection: string, category: string, deal: string, item: string, cat: string, img: any}) {
+    create(@Body() data: {user: string, collection: string, category: string, deal: string, item: string, cat: string, img: any}) {
         data.img = ItemsController.imgName
-        return this.itemService.postItem(data)
+        return this.itemService.createItem(data)
     };
 
-    @Get('params')
-    getByParams(@Query() params: any): Promise<IItemDB[]> { 
-        return this.itemService.getByParams(params)
+    @Get('get-one-by-id')
+    getOneById(@Query('id') id: string): Promise<IItemDB> {
+        return this.itemService.getOneById(id)
     };
-
-    @Get('user')
-    getByUserIdOwner(@Query('id') id: string): Promise<IItemDB[]> {
-        return this.itemService.getByUserIdForOwner(id)
+    @Get('get-many-by-params')
+    getManyByParams(@Query() params: string): Promise<IItemDB[]> { 
+        return this.itemService.getManyByParams(params)
     };
-
-    @Get('users')
+    @Get('get-all-by-owner-id')
+    getManyByOwnerId(@Query('id') id: string): Promise<IItemDB[]> {
+        return this.itemService.getAllByOwnerId(id)
+    };
+    @Get('get-many-by-user-id')
     getByUserIdUsers(@Query('id') id: string): Promise<IItemDB[]> {
-        return this.itemService.getByUserIdForUsers(id)
+        return this.itemService.getManyByUserId(id)
     };
+    @Post('get-many-from-array')
+    getManyFromArray(@Body() dto: IItemBookmark[]): Promise<any> {
+        console.log('goo')
+        return this.itemService.getManyByIdFromArray(dto)
+    }
 
-    @Get('id')
-    getById(@Query('id') id: string): Promise<IItemDB> {
-        return this.itemService.getById(id)
-    };
 
-    @Delete('delete')
+    @Delete('delete-one-by-id-and-collection')
     deleteById(@Query() params: {id: string, collection: string}): Promise<any> {
-        return this.itemService.deleteItem(params.id, params.collection)
+        console.log('we try delete ', params.id)
+        return this.itemService.deleteOneById(params.id, params.collection)
+    };
+    @Post('delete-by-id-and-collection-from-array')
+    deleteByIdAndCollectionFromArray(@Body() array: {id: string, collection: string}[]): Promise<any> {
+        return this.itemService.deleteByIdAndCollectionFromArray(array)
+    };
+    @Delete('delete-all-in-collection')
+    deleteAllInCollection(@Query('collection') collection: string): Promise<any> {
+        return this.itemService.deleteAllInCollection(collection)
+    };  
+    @Delete('delete-all-by-user-id') 
+    deleteByUserId(@Query('id') id: string): Promise<any> {
+        return this.itemService.deleteAllByUserId(id)
     };
 
-    @Delete('delete-all')
-    deleteAll(@Query('collection') collection: string): Promise<any> {
-        return this.itemService.deleteAll(collection)
-    };   
 
-    @Patch('update') 
-    updateByParams(@Body() data: {id: string, collection: string, params: string}): Promise<any> {
-        return this.itemService.updateByParams(data)
+    @Patch('update-show-hide-from-array') 
+    updateShowHideFromArray(@Body() array: {id: string, collection: string, show: boolean}[]): Promise<string> {
+        console.log('мы на беке')
+        return this.itemService.updateShowHideFromArray(array)
     };
 }
 

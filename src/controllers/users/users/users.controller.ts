@@ -9,6 +9,7 @@ export class UsersController {
 
     @Get('admin/:id')
     checkRole(@Param('id') id: string): Promise<any> {
+        console.log('search role ...')
         return this.userService.checkRole(id)
     };
 
@@ -22,7 +23,7 @@ export class UsersController {
         return this.userService.login(dto)
     };
 
-    @Delete('delete/:id')
+    @Delete('delete-user-and-items/:id')
     deleteById(@Param() id: string): Promise<any> {
         return this.userService.deleteById(id)
     };

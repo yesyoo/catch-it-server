@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
 import { HydratedDocument, Document } from 'mongoose';
-import { IBookmark } from 'src/interfaces/bookmark';
+import { IItemBookmark } from 'src/interfaces/bookmark';
 
 
 @Schema()
-export class Bookmark implements IBookmark {
+export class ItemBookmark implements IItemBookmark {
 
     @Prop() userId: string
  
@@ -12,7 +12,9 @@ export class Bookmark implements IBookmark {
 
     @Prop() collection: string
 
+    @Prop() title: string
+
 }
 
-export const BookmarkSchema = SchemaFactory.createForClass(Bookmark);
-export type BookmarkDocument = HydratedDocument<Bookmark>;
+export const ItemBookmarkSchema = SchemaFactory.createForClass(ItemBookmark);
+export type ItemBookmarkDocument = HydratedDocument<ItemBookmark>;

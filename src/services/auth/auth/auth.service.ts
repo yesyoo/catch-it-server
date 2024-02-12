@@ -16,12 +16,7 @@ export class AuthService extends PassportStrategy(Strategy) {
         if(user) {
             return true 
         } else {
-            throw new HttpException( 
-                {
-                    status: HttpStatus.CONFLICT,
-                    errorText: 'Incorrect password'
-                }, 
-                HttpStatus.CONFLICT)
+            return false
         }
     };
 }

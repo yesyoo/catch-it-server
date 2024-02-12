@@ -1,5 +1,7 @@
-export interface IBookmark {
+export interface IItemBookmark {
+    _id?: string,
     userId: string,
     itemId: string,
-    collection: string
+    collection: string,
+    title: string
 }
