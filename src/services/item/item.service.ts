@@ -41,12 +41,17 @@ export class ItemService {
     };
 
     async getOneById(id: string): Promise<any> {
-        const models: any[] = this.models()
-        return new Promise((res) => {
-            models.forEach(async model => {
-                await model.findById(id)
-            })
-            res(true)
+        const models = this.models()
+        let obj: IItemDB;
+        return new Promise(res => {
+            (async () => {
+                for(let i = 0; i < models.length; i++) {
+                    obj = await models[i].findById(id)
+                    if(obj) {
+                        res(obj)
+                    }
+                }
+            })()
         })
     }
          
