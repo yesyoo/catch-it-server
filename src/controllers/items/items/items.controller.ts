@@ -3,7 +3,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { IItemDB } from 'src/interfaces/items';
 import { ItemService } from 'src/services/item/item.service';
 import { diskStorage } from 'multer';
-import { query } from 'express';
 import { IItemBookmark } from 'src/interfaces/bookmark';
 
 
@@ -52,14 +51,10 @@ export class ItemsController {
     };
     @Post('get-many-from-array')
     getManyFromArray(@Body() dto: IItemBookmark[]): Promise<any> {
-        console.log('goo')
         return this.itemService.getManyByIdFromArray(dto)
     }
-
-
     @Delete('delete-one-by-id-and-collection')
     deleteById(@Query() params: {id: string, collection: string}): Promise<any> {
-        console.log('we try delete ', params.id)
         return this.itemService.deleteOneById(params.id, params.collection)
     };
     @Post('delete-by-id-and-collection-from-array')
@@ -77,9 +72,8 @@ export class ItemsController {
 
 
     @Patch('update-show-hide-from-array') 
-    updateShowHideFromArray(@Body() array: {id: string, collection: string, show: boolean}[]): Promise<string> {
-        console.log('мы на беке')
-        return this.itemService.updateShowHideFromArray(array)
+    updateAccessFromArray(@Body() array: {id: string, collection: string, show: boolean}[]): Promise<string> {
+        return this.itemService.updateAccessFromArray(array)
     };
 }
 

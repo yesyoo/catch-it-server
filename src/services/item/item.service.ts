@@ -1,8 +1,6 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { AsyncResource } from 'async_hooks';
 import { Model } from 'mongoose';
-import { iif } from 'rxjs';
 import { ItemDto } from 'src/dto/item/item-dto';
 import { PersonalClothesDto } from 'src/dto/item/personal-dto';
 import { IItemBookmark } from 'src/interfaces/bookmark';
@@ -41,21 +39,18 @@ export class ItemService {
                 return new this.personalShoesModel(obj).save()  
         }
     };
-/////////////////////////////////////////////////////////////////////////////////
+
     async getOneById(id: string): Promise<any> {
         const models: any[] = this.models()
         return new Promise((res) => {
             models.forEach(async model => {
-                await model.findById(id).then((data: IItemDB) => {
-                    if(data) {
-                        res(data)
-                    }
-                })
+                await model.findById(id)
             })
-        });
-    };     
+            res(true)
+        })
+    }
+         
     async getManyByIdFromArray(array: IItemBookmark[]): Promise<any> {
-        console.log('arr', array)
         return new Promise(res => {
             let resultArr: any[] = [];
             (async () => {
@@ -63,11 +58,11 @@ export class ItemService {
                     switch(array[i].collection) {
                         case 'personal-shoes':
                             const shoes = await this.personalShoesModel.findOne({_id: array[i].itemId, show: true})
-                            if(shoes) resultArr.push(shoes)
+                            resultArr.push(shoes)
                             break;
                         case 'personal-clothes': 
                             const clothes = await this.personalClothesModel.findOne({_id: array[i].itemId, show: true})
-                            if(clothes) resultArr.push(clothes)
+                            resultArr.push(clothes)
                             break;
                     }
                 }
@@ -108,16 +103,7 @@ export class ItemService {
                     });  
                 };
                 res(result)
-                // if(result.length > 0) {
-                //     res(result);
-                // } else {
-                //     throw new HttpException( 
-                //         {
-                //             status: HttpStatus.CONFLICT,
-                //             errorText: `Items by user id:${id} not found`
-                //         }, 
-                //         HttpStatus.CONFLICT)
-                // }
+
             })();
         })
     };
@@ -133,46 +119,34 @@ export class ItemService {
                     })
                 };
                 res(result)
-                // if(result.length > 0) {
-                //     res(result)
-                // } else {
-                //     throw new HttpException( 
-                //         {
-                //             status: HttpStatus.CONFLICT,
-                //             errorText: `Items by user id:${id} not found`
-                //         }, 
-                //         HttpStatus.CONFLICT)
-                // }
+                
             })();
         });
     };
-/////////////////////////////////////////////////////////////////////////////////
+
     async deleteOneById(id: string, collection: string): Promise<any> {
         switch(collection) {
             case 'personal-shoes':
-                return await this.personalShoesModel.findByIdAndDelete(id)
+                return await this.personalShoesModel.findByIdAndDelete(id);
             case 'personal-clothes':
                 return await this.personalClothesModel.findByIdAndDelete(id)
         };
     };
 
-    async deleteByIdAndCollectionFromArray(array: {id: string, collection: string}[]): Promise<string> {
+    async deleteByIdAndCollectionFromArray(array: {id: string, collection: string}[]): Promise<any> {
         return new Promise(res => {
             (async () => {
-                for(let i = 0; i <= array.length; i++) {
+                for(let i = 0; i < array.length; i++) {
                     switch(array[i].collection) {
                         case 'personal-shoes':
-                            await this.personalShoesModel.findByIdAndDelete(array[i].id).then(res => {
+                            await this.personalShoesModel.findByIdAndDelete(array[i].id)
                                 
-                            })
                         case 'personal-clothes':
-                            await this.personalClothesModel.findByIdAndDelete(array[i].id).then(res => {
-                               
-                            })
+                            await this.personalClothesModel.findByIdAndDelete(array[i].id)
                     };
-                    if(i === array.length) { res('Success') };
+                    res(true);
                 };   
-            })
+            })();
         })    
     };
 
@@ -197,23 +171,19 @@ export class ItemService {
         });
     };
  ////////////////////////////////////////////////////////////////////////////////////////////////// 
-    async updateShowHideFromArray(array: {id: string, collection: string, show: boolean}[]): Promise<any> {
-       
+    async updateAccessFromArray(array: {id: string, collection: string, show: boolean}[]): Promise<any> {       
         return new Promise(res => {
-            
             (async () => {
-              
                 for(let i = 0; i < array.length; i++) {
                     switch(array[i].collection) {
                         case 'personal-shoes':
-                            console.log(array[i].collection)
                             await this.personalShoesModel.findByIdAndUpdate(array[i].id, {show: array[i].show})
                         case 'personal-clothes':
                             await this.personalClothesModel.findByIdAndUpdate(array[i].id, {show: array[i].show})
                     };
                     
-                };   
-                res(true) 
+                }; 
+                res('Success') 
             })();
         })    
     };

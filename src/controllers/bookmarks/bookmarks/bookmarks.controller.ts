@@ -17,11 +17,11 @@ export class BookmarksController {
         return this.bookmarkService.getAllByUserId(id)
     };
 
-    @Delete('delete-one/:id')
+    @Delete('delete-one-by-id-and-collection')
     deleteOne(@Param('id') itemId: string): Promise<any> {
         return this.bookmarkService.deleteOneByItemId(itemId)
     };
-    @Post('delete-many')
+    @Post('delete-by-id-and-collection-from-array')
     deleteMany(@Body() arrId: string[]): Promise<any> {
         return this.bookmarkService.deleteManyFromArray(arrId)
     };
