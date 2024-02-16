@@ -3,7 +3,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { IItemDB } from 'src/interfaces/items';
 import { ItemService } from 'src/services/item/item.service';
 import { diskStorage } from 'multer';
-import { IItemBookmark } from 'src/interfaces/bookmark';
+import { IItemBookmark, IUserListItem, IUserListItemAccess } from 'src/interfaces/bookmark';
+
 
 
 
@@ -33,7 +34,7 @@ export class ItemsController {
         return this.itemService.createItem(data)
     };
 
-    @Get('get-one-by-id')
+    @Get('get-one')
     getOneById(@Query('id') id: string): Promise<IItemDB> {
         return this.itemService.getOneById(id)
     };
@@ -41,39 +42,36 @@ export class ItemsController {
     getManyByParams(@Query() params: string): Promise<IItemDB[]> { 
         return this.itemService.getManyByParams(params)
     };
-    @Get('get-all-by-owner-id')
+    @Post('get-many')
+    getManyFromArray(@Body() dto: IUserListItem[]): Promise<any> {
+        return this.itemService.getManyByIdFromArray(dto)
+    };
+    @Get('owner')
     getManyByOwnerId(@Query('id') id: string): Promise<IItemDB[]> {
         return this.itemService.getAllByOwnerId(id)
     };
-    @Get('get-many-by-user-id')
+    @Get('user')
     getByUserIdUsers(@Query('id') id: string): Promise<IItemDB[]> {
         return this.itemService.getManyByUserId(id)
     };
-    @Post('get-many-from-array')
-    getManyFromArray(@Body() dto: IItemBookmark[]): Promise<any> {
-        return this.itemService.getManyByIdFromArray(dto)
-    }
-    @Delete('delete-one-by-id-and-collection')
-    deleteById(@Query() params: {id: string, collection: string}): Promise<any> {
-        return this.itemService.deleteOneById(params.id, params.collection)
+
+    @Delete('delete-one')
+    deleteById(@Query() params: IUserListItem): Promise<any> {
+        return this.itemService.deleteOneById(params)
     };
-    @Post('delete-by-id-and-collection-from-array')
-    deleteByIdAndCollectionFromArray(@Body() array: {id: string, collection: string}[]): Promise<any> {
-        return this.itemService.deleteByIdAndCollectionFromArray(array)
+    @Post('delete-many')
+    deleteMany(@Body() array: IUserListItem[]): Promise<any> {
+        return this.itemService.deleteMany(array)
     };
-    @Delete('delete-all-in-collection')
-    deleteAllInCollection(@Query('collection') collection: string): Promise<any> {
-        return this.itemService.deleteAllInCollection(collection)
-    };  
-    @Delete('delete-all-by-user-id') 
+
+    @Delete('user') 
     deleteByUserId(@Query('id') id: string): Promise<any> {
         return this.itemService.deleteAllByUserId(id)
     };
 
-
-    @Patch('update-show-hide-from-array') 
-    updateAccessFromArray(@Body() array: {id: string, collection: string, show: boolean}[]): Promise<string> {
-        return this.itemService.updateAccessFromArray(array)
+    @Patch('access') 
+    updateAccess(@Body() array: IUserListItemAccess[]): Promise<string> {
+        return this.itemService.updateAccess(array)
     };
 }
 

@@ -9,7 +9,6 @@ export class UsersController {
 
     @Get('admin/:id')
     checkRole(@Param('id') id: string): Promise<any> {
-        console.log('search role ...')
         return this.userService.checkRole(id)
     };
 

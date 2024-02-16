@@ -19,29 +19,11 @@ export class BookmarkService {
         return await this.bookmarkModel.find({userId: id})
     };
 
-    async getById(id: string): Promise<any> {
-        return await this.bookmarkModel.findById(id)
-    };
-
-    async deleteOneByItemId(id: string): Promise<any> {
-        return await this.bookmarkModel.deleteOne({itemId: id})
+    async deleteOneByItemId(data: any): Promise<any> {
+        return await this.bookmarkModel.findOneAndDelete({userId: data.userId, itemId: data.itemId})
     };
 
     async deleteAllByUserId(id: string): Promise<any> {
         return await this.bookmarkModel.deleteMany({userId: id})
     };
-
-    async deleteManyFromArray(arrId: string[]): Promise<any> {
-        return new Promise(res => {
-            (async () => {
-                if(Array.isArray(arrId)) {
-                    arrId.forEach(async id => {
-                        await this.bookmarkModel.findByIdAndDelete(id)
-                    })
-                }
-            })()
-            res(true)
-        })
-    };
-
 }

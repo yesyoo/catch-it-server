@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ItemDto } from 'src/dto/item/item-dto';
 import { PersonalClothesDto } from 'src/dto/item/personal-dto';
-import { IItemBookmark } from 'src/interfaces/bookmark';
+import { IItemBookmark, IUserListItem, IUserListItemAccess } from 'src/interfaces/bookmark';
 import { IItemDB } from 'src/interfaces/items';
 import { PersonalClothesDocument, Personal_Clothes } from 'src/schemas/item/personal/clothes-schema';
 import { PersonalShoesDocument, Personal_Shoes } from 'src/schemas/item/personal/shoes-schema';
@@ -55,18 +55,18 @@ export class ItemService {
         })
     }
          
-    async getManyByIdFromArray(array: IItemBookmark[]): Promise<any> {
+    async getManyByIdFromArray(array: IUserListItem[]): Promise<any> {
         return new Promise(res => {
             let resultArr: any[] = [];
             (async () => {
                 for(let i = 0; i < array.length; i++) {
                     switch(array[i].collection) {
                         case 'personal-shoes':
-                            const shoes = await this.personalShoesModel.findOne({_id: array[i].itemId, show: true})
+                            const shoes = await this.personalShoesModel.findOne({_id: array[i].id, show: true})
                             resultArr.push(shoes)
                             break;
                         case 'personal-clothes': 
-                            const clothes = await this.personalClothesModel.findOne({_id: array[i].itemId, show: true})
+                            const clothes = await this.personalClothesModel.findOne({_id: array[i].id, show: true})
                             resultArr.push(clothes)
                             break;
                     }
@@ -129,16 +129,16 @@ export class ItemService {
         });
     };
 
-    async deleteOneById(id: string, collection: string): Promise<any> {
-        switch(collection) {
+    async deleteOneById(obj: IUserListItem): Promise<any> {
+        switch(obj.collection) {
             case 'personal-shoes':
-                return await this.personalShoesModel.findByIdAndDelete(id);
+                return await this.personalShoesModel.findByIdAndDelete(obj.id);
             case 'personal-clothes':
-                return await this.personalClothesModel.findByIdAndDelete(id)
+                return await this.personalClothesModel.findByIdAndDelete(obj.id)
         };
     };
 
-    async deleteByIdAndCollectionFromArray(array: {id: string, collection: string}[]): Promise<any> {
+    async deleteMany(array: IUserListItem[]): Promise<any> {
         return new Promise(res => {
             (async () => {
                 for(let i = 0; i < array.length; i++) {
@@ -155,15 +155,6 @@ export class ItemService {
         })    
     };
 
-    async deleteAllInCollection(collection: string): Promise<any> {
-        switch(collection) {
-            case 'personal-shoes':
-                return await this.personalShoesModel.deleteMany({})
-            case 'personal-clothes':
-                return await this.personalClothesModel.deleteMany({})
-        };
-    };
-
     async deleteAllByUserId(id: string): Promise<any> {
         const models = this.models();
         return new Promise((res) => {
@@ -175,8 +166,8 @@ export class ItemService {
             })();
         });
     };
- ////////////////////////////////////////////////////////////////////////////////////////////////// 
-    async updateAccessFromArray(array: {id: string, collection: string, show: boolean}[]): Promise<any> {       
+
+    async updateAccess(array: IUserListItemAccess[]): Promise<any> {       
         return new Promise(res => {
             (async () => {
                 for(let i = 0; i < array.length; i++) {
@@ -186,13 +177,12 @@ export class ItemService {
                         case 'personal-clothes':
                             await this.personalClothesModel.findByIdAndUpdate(array[i].id, {show: array[i].show})
                     };
-                    
                 }; 
-                res('Success') 
+                res(true) 
             })();
         })    
     };
-//////////////////////////////////////////////////////////////////////////////////////////////////
+
     models(): any[] {
         return [this.personalShoesModel, this.personalClothesModel]
     };

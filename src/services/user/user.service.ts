@@ -17,7 +17,6 @@ export class UserService {
 
     async checkRole(id: string): Promise<any> {
         const user = await this.userModel.findById(id)
-        console.log('role', user.role)
         return user.role
     };
 
@@ -141,7 +140,6 @@ export class UserService {
     };
 
     async updateUserData(id: string, data: any): Promise<User_data> {
-        //UserDataDto new UserDataDto(data)
         const update = await this.userDataModel.findOneAndUpdate({user: id}, {})
         return update
     };
