@@ -1,19 +1,18 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User_data, UserDataDocument } from 'src/schemas/user/user-data-schema';
+import { Data_users, DataUsersDocument } from 'src/schemas/user/user-data-schema';
 import { User, UserDocument } from 'src/schemas/user/user-schema';
 import * as bcrypt from 'bcrypt'
 import { UserDataDto } from '../../dto/user/user-data-dto';
 import { JwtService } from '@nestjs/jwt';
-import { ItemService } from '../item/item.service';
 
 @Injectable()
 export class UserService {
     constructor(private jwtService: JwtService,
-                private itemServise: ItemService,
+
                 @InjectModel(User.name) private userModel: Model<UserDocument>,
-                @InjectModel(User_data.name) private userDataModel: Model<UserDataDocument>) {}
+                @InjectModel(Data_users.name) private userDataModel: Model<DataUsersDocument>) {}
 
     async checkRole(id: string): Promise<any> {
         const user = await this.userModel.findById(id)
@@ -39,7 +38,7 @@ export class UserService {
             throw new HttpException( 
                 {
                     status: HttpStatus.CONFLICT,
-                    errorText: 'Username must be unique'
+                    errorText: 'Имя пользователя должно быть уникальным'
                 }, 
                 HttpStatus.CONFLICT)
            }
@@ -47,7 +46,7 @@ export class UserService {
         throw new HttpException( 
             {
                 status: HttpStatus.CONFLICT,
-                errorText: 'User already exists'
+                errorText: 'Пользователь уже существует'
             }, 
             HttpStatus.CONFLICT)
        }
@@ -73,7 +72,7 @@ export class UserService {
             throw new HttpException( 
                 {
                     status: HttpStatus.CONFLICT,
-                    errorText: 'User not found'
+                    errorText: 'Пользователь не найден'
                 }, 
                 HttpStatus.CONFLICT)
         }
@@ -91,7 +90,7 @@ export class UserService {
             throw new HttpException( 
                 {
                     status: HttpStatus.CONFLICT,
-                    errorText: 'Incorrect password'
+                    errorText: 'Неверный пароль'
                 }, 
                 HttpStatus.CONFLICT)
         }
@@ -102,9 +101,7 @@ export class UserService {
         const user = await this.userModel.findOne({email: email})
         if(user) {
             return user.password
-        } else {
-            //error
-        }
+        } 
     };
 
     async getUserById(id: string): Promise<User> {
@@ -116,12 +113,10 @@ export class UserService {
             throw new HttpException( 
                 {
                     status: HttpStatus.CONFLICT,
-                    errorText: 'User not found'
+                    errorText: 'Пользователь не найден'
                 }, 
                 HttpStatus.CONFLICT)
            }
-            //error
-        
     };
 
     async getUserDataByUserId(id: string): Promise<any> {
@@ -133,13 +128,13 @@ export class UserService {
             throw new HttpException( 
                 {
                     status: HttpStatus.CONFLICT,
-                    errorText: 'User not found'
+                    errorText: 'Пользователь не найден'
                 }, 
                 HttpStatus.CONFLICT)
         }
     };
 
-    async updateUserData(id: string, data: any): Promise<User_data> {
+    async updateUserData(id: string, data: any): Promise<Data_users> {
         const update = await this.userDataModel.findOneAndUpdate({user: id}, {})
         return update
     };
@@ -147,18 +142,5 @@ export class UserService {
     async deleteById(id: string): Promise<any> {
         const userData = await this.userDataModel.findOneAndDelete({user: id});
         const user = await this.userModel.findByIdAndDelete(id);
-        await this.itemServise.deleteAllByUserId(id).then(res => {
-            if(userData === null && user === null) {
-                return {message: `User ${id} deleted`}
-            } else {
-                console.log('Error')
-                throw new HttpException( 
-                    {
-                        status: HttpStatus.CONFLICT,
-                        errorText: 'Error'
-                    }, 
-                    HttpStatus.CONFLICT)
-            };
-        });
     };
 };

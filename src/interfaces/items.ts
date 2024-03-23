@@ -54,6 +54,7 @@ export interface IPersonalClothes {
 
 export interface IItemDB {
     user: string,
+    username: string,
     collection: string,
     category: string,
     deal: string,

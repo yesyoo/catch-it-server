@@ -3,7 +3,7 @@ import { HydratedDocument, Document } from 'mongoose';
 import { IUserData } from 'src/interfaces/user';
 
 @Schema()
-export class User_data implements IUserData {
+export class Data_users implements IUserData {
 
     @Prop() username: string
 
@@ -19,5 +19,5 @@ export class User_data implements IUserData {
 
 }
 
-export const UserDataSchema = SchemaFactory.createForClass(User_data);
-export type UserDataDocument = HydratedDocument<User_data>;
+export const DataUsersSchema = SchemaFactory.createForClass(Data_users);
+export type DataUsersDocument = HydratedDocument<Data_users>;

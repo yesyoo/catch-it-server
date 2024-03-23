@@ -1,9 +1,9 @@
-import { Controller, Post, Body, Get, Query, Delete, UseInterceptors, Patch, Put } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Delete, UseInterceptors, Patch } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { IItemDB } from 'src/interfaces/items';
 import { ItemService } from 'src/services/item/item.service';
 import { diskStorage } from 'multer';
-import { IItemBookmark, IUserListItem, IUserListItemAccess } from 'src/interfaces/bookmark';
+import { IUserListItem, IUserListItemAccess } from 'src/interfaces/bookmark';
 
 
 
@@ -29,8 +29,9 @@ export class ItemsController {
             }
         )
     }))
-    create(@Body() data: {user: string, collection: string, category: string, deal: string, item: string, cat: string, img: any}) {
+    create(@Body() data: {user: string, username: string, collection: string, category: string, deal: string, item: string, cat: string, img: any}) {
         data.img = ItemsController.imgName
+        console.log(data)
         return this.itemService.createItem(data)
     };
 
@@ -64,7 +65,7 @@ export class ItemsController {
         return this.itemService.deleteMany(array)
     };
 
-    @Delete('user') 
+    @Delete('by-user') 
     deleteByUserId(@Query('id') id: string): Promise<any> {
         return this.itemService.deleteAllByUserId(id)
     };

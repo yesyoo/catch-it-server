@@ -26,6 +26,8 @@ export class Personal_Shoes {
 
     @Prop() user: string
 
+    @Prop() username: string
+
     @Prop() collection: string
  
     @Prop() category: string

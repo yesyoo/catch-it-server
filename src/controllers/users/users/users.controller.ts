@@ -22,7 +22,7 @@ export class UsersController {
         return this.userService.login(dto)
     };
 
-    @Delete('delete-user-and-items/:id')
+    @Delete('/:id')
     deleteById(@Param() id: string): Promise<any> {
         return this.userService.deleteById(id)
     };
@@ -33,7 +33,7 @@ export class UsersController {
     };
 
     @Get('user-data')
-    getUserDataByUserId(@Query('user') id: string): Promise<any> {
+    getUserDataByUserId(@Query('id') id: string): Promise<any> {
         return this.userService.getUserDataByUserId(id)
     };
 }

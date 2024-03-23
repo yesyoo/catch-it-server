@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ItemDto } from 'src/dto/item/item-dto';
 import { PersonalClothesDto } from 'src/dto/item/personal-dto';
-import { IItemBookmark, IUserListItem, IUserListItemAccess } from 'src/interfaces/bookmark';
+import { IUserListItem, IUserListItemAccess } from 'src/interfaces/bookmark';
 import { IItemDB } from 'src/interfaces/items';
 import { PersonalClothesDocument, Personal_Clothes } from 'src/schemas/item/personal/clothes-schema';
 import { PersonalShoesDocument, Personal_Shoes } from 'src/schemas/item/personal/shoes-schema';
@@ -14,12 +14,13 @@ export class ItemService {
     constructor(@InjectModel(Personal_Shoes.name) private personalShoesModel: Model<PersonalShoesDocument>,
                 @InjectModel(Personal_Clothes.name) private personalClothesModel: Model<PersonalClothesDocument>) {}
 
-    async createItem(data: {user: string, collection: string, category: string, deal: string, item: string, cat: string, img: string }): Promise<any> {
+    async createItem(data: {user: string, username: string, collection: string, category: string, deal: string, item: string, cat: string, img: string }): Promise<any> {
         const item = JSON.parse(data.item)
         const cat = JSON.parse(data.cat)
         console.log('deal', data.deal)
         let obj = {
             user: data.user,
+            username: data.username,
             collection: data.collection,
             category: data.category,
             deal: data.deal,
